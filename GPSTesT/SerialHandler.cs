@@ -78,11 +78,11 @@ namespace GPSTesT
                   actual = input[a];
                   for (int b = 0; b < 4; b++)
                   {
-                      inverted |= (char)((actual & (1 << b) << (8 - b)) & (1 << (8 - b)));
+                      inverted |= (char)(((actual & (1 << b)) << (7 - 2*b)) & (1 << (7 - b)));
                   }
                   for (int b = 4; b < 8; b++)
                   {
-                      inverted |= (char)((actual & (1 << b) >> b) & (1 << (8 - b)));
+                      inverted |= (char)(((actual & (1 << b)) >> 1+2*(b-4)) & (1 << (7 - b)));
                   }
                   result += inverted;
               }
@@ -91,8 +91,10 @@ namespace GPSTesT
 
 		  public void Send()
 		  {
+              string inverted;
 				while(sendQueue.Count != 0){
-					 ComPort.Write(sendQueue.Dequeue());
+                    inverted = invertBitOrder(sendQueue.Dequeue());
+					 ComPort.Write(inverted);
 				}
 		  }
 		  
