@@ -67,6 +67,28 @@ namespace GPSTesT
 				}
 		  }
 
+          public string invertBitOrder(string input)
+          {
+              string result = "";
+              char actual;
+              char inverted;
+              for (int a = 0; a < input.Length; a++)
+              {
+                  inverted = '\x0';
+                  actual = input[a];
+                  for (int b = 0; b < 4; b++)
+                  {
+                      inverted |= (char)((actual & (1 << b) << (8 - b)) & (1 << (8 - b)));
+                  }
+                  for (int b = 4; b < 8; b++)
+                  {
+                      inverted |= (char)((actual & (1 << b) >> b) & (1 << (8 - b)));
+                  }
+                  result += inverted;
+              }
+              return result;
+          }
+
 		  public void Send()
 		  {
 				while(sendQueue.Count != 0){
