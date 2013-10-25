@@ -93,8 +93,8 @@ namespace GPSTesT
 		  {
               string inverted;
 				while(sendQueue.Count != 0){
-                    inverted = invertBitOrder(sendQueue.Dequeue());
-					 ComPort.Write(inverted);
+                   // inverted = invertBitOrder(sendQueue.Dequeue());
+					 ComPort.Write(sendQueue.Dequeue());
 				}
 		  }
 		  

@@ -18,6 +18,8 @@ namespace GPSTesT
 		  private bool first;					  //Indicates functions first call
 		  private string filterString;
           private StreamWriter writer;
+          private int count;
+          private int divisor;
 
 		  public DataHandler(Queue<string> displayData, Queue<string> input, Queue<string>ggaQueue)		  //Constructor
 		  {
@@ -28,7 +30,14 @@ namespace GPSTesT
 				first = true;
 				actualLine = "";
 				filterString = "";
+                count = 30;
+                divisor = 30;
 		  }
+
+          private void changeDivisor(int divisor)
+          {
+              this.divisor = divisor;
+          }
 
 		  public void Add()		  //Process data
 		  {
@@ -52,16 +61,24 @@ namespace GPSTesT
 						  {
                               for (int b = 0; b < splittedString.Length; b++)
                               {
-                                  if (replaced.Contains(splittedString[b]) == true)
+                                  if ((replaced.Contains(splittedString[b]) == true))
                                   {
-                                      displayData.Enqueue(replaced);
-                                      writer.WriteLine(replaced);
+                                      if (count == 0)
+                                      {
+                                          displayData.Enqueue(replaced);
+                                          writer.WriteLine(replaced);
+                                      }
                                   }
                               }
 						  }
-						  if (Line.Contains("GPGGA") == true)
+						  if ((Line.Contains("GPGGA") == true))
 						  {
-								ggaQueue.Enqueue(replaced);
+                              if (count == 0)
+                              {
+                                  ggaQueue.Enqueue(replaced);
+                                  count = divisor;
+                              }
+                              count--;
 						  }
 					 }
 				}

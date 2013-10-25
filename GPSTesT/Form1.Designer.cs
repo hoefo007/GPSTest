@@ -45,6 +45,7 @@
             this.cloudButton = new System.Windows.Forms.Button();
             this.setIntervallButton = new System.Windows.Forms.Button();
             this.rateBox = new System.Windows.Forms.TextBox();
+            this.divisorBox = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // ComPort1
@@ -118,7 +119,7 @@
             // 
             // FilterBox
             // 
-            this.FilterBox.Location = new System.Drawing.Point(471, 159);
+            this.FilterBox.Location = new System.Drawing.Point(471, 147);
             this.FilterBox.Name = "FilterBox";
             this.FilterBox.Size = new System.Drawing.Size(100, 20);
             this.FilterBox.TabIndex = 6;
@@ -127,7 +128,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(468, 143);
+            this.label2.Location = new System.Drawing.Point(468, 131);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(29, 13);
             this.label2.TabIndex = 7;
@@ -135,7 +136,7 @@
             // 
             // FilterButton
             // 
-            this.FilterButton.Location = new System.Drawing.Point(481, 185);
+            this.FilterButton.Location = new System.Drawing.Point(481, 173);
             this.FilterButton.Name = "FilterButton";
             this.FilterButton.Size = new System.Drawing.Size(75, 23);
             this.FilterButton.TabIndex = 8;
@@ -181,11 +182,20 @@
             this.rateBox.TabIndex = 12;
             this.rateBox.Text = "001";
             // 
+            // divisorBox
+            // 
+            this.divisorBox.Location = new System.Drawing.Point(471, 201);
+            this.divisorBox.Name = "divisorBox";
+            this.divisorBox.Size = new System.Drawing.Size(100, 20);
+            this.divisorBox.TabIndex = 13;
+            this.divisorBox.Text = "60";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(593, 262);
+            this.Controls.Add(this.divisorBox);
             this.Controls.Add(this.rateBox);
             this.Controls.Add(this.setIntervallButton);
             this.Controls.Add(this.cloudButton);
@@ -225,6 +235,7 @@
 		  private System.Windows.Forms.Button cloudButton;
           private System.Windows.Forms.Button setIntervallButton;
           private System.Windows.Forms.TextBox rateBox;
+          private System.Windows.Forms.TextBox divisorBox;
 	 }
 }
 

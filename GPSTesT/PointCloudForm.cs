@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Collections;
+using System.IO;
 
 namespace GPSTesT
 {
@@ -26,11 +27,11 @@ namespace GPSTesT
 				public double Latitude;
 				public double Longitude;
 				public double DOP;
-				public char hour;
-				public char minute;
-				public char second;
+				public int hour;
+				public int minute;
+				public int second;
 
-				public Coordinate(double Latitude, double Longitude, double DOP, char hour, char minute, char second)
+				public Coordinate(double Latitude, double Longitude, double DOP, int hour, int minute, int second)
 				{
 					 this.Latitude = Latitude;
 					 this.Longitude = Longitude;
@@ -62,10 +63,56 @@ namespace GPSTesT
 
 		  }
 
+         private void importFile(string fileName){
+             StreamReader reader = new StreamReader(fileName);
+             string line = reader.ReadLine();
+             while(reader.EndOfStream == false){
+                 while((line == "")&&(reader.EndOfStream==false)){
+                     line = reader.ReadLine();
+                 }
+                if(line.Contains("GGA")==true){
+                    ggaQueue.Enqueue(line);
+                }
+             }
+             reader.Close();
+         }
+
 		  private void label2_Click(object sender, EventArgs e)
 		  {
 
 		  }
+
+          private Color getColor(Coordinate input)
+          {
+              switch (input.hour)
+              {
+                  case (0): return Color.Blue;
+                  case (1): return Color.BlueViolet;
+                  case (2): return Color.Violet;
+                  case (3): return Color.PaleVioletRed;
+                  case (4): return Color.Red;
+                  case (5): return Color.OrangeRed;
+                  case (6): return Color.Orange;
+                  case (7): return Color.Yellow;
+                  case (8): return Color.YellowGreen;
+                  case (9): return Color.Green;
+                  case (10): return Color.LightSeaGreen;
+                  case (11): return Color.LightSkyBlue;
+                  case (12): return Color.Blue;
+                  case (13): return Color.BlueViolet;
+                  case (14): return Color.Violet;
+                  case (15): return Color.PaleVioletRed;
+                  case (16): return Color.Red;
+                  case (17): return Color.OrangeRed;
+                  case (18): return Color.Orange;
+                  case (19): return Color.Yellow;
+                  case (20): return Color.YellowGreen;
+                  case (21): return Color.Green;
+                  case (22): return Color.LightSeaGreen;
+                  case (23): return Color.LightSkyBlue;
+                  default: return Color.White;
+              }
+          }
 
 		  private int getDotSize(double dop)		//Return circle size according do DOP value
 		  {
@@ -113,9 +160,9 @@ namespace GPSTesT
 				}
 				else
 				{
-					 if (numberOfRecords > 2)							//Set startpoint for redraw
+					 if (numberOfRecords > 5)							//Set startpoint for redraw
 					 {
-						  startVal = numberOfRecords - 2;
+						  startVal = numberOfRecords - 5;
 					 }
 					 else
 					 {
@@ -126,9 +173,10 @@ namespace GPSTesT
 
 				for (int a = startVal; a < numberOfRecords; a++)		  //Draw the points
 				{
+                    drawPen = new Pen(getColor((Coordinate)coordArray[a]), 2);
 					 actualPoint = (Coordinate)coordArray[a];				  //Get a point
 					 drawPoint = new Point((int)((actualPoint.Longitude - centerLong) * zoom + (pictureBox.Width / 2)+ offsetX), (int)((centerLat - actualPoint.Latitude) * zoom + (pictureBox.Height / 2) + offsetY));  //calculate position on window
-					 size = getDotSize((double)dopArray[a]);				  //Get size of circle
+					 size = getDotSize(actualPoint.DOP);				  //Get size of circle
 					 if (a == (numberOfRecords - 1))							  //If last point to draw, draw red
 					 {
 						  drawBoard.DrawEllipse(lastPen, drawPoint.X - (size / 2), drawPoint.Y - (size / 2), size, size);
@@ -220,7 +268,7 @@ namespace GPSTesT
 				char[] splitChar = { '.' };
 				string[] splitResult, rawLatitude, rawLongitude;
 				double minLatitude, minLongitude;
-				char hour, minute, second;
+				int hour, minute, second;
 				string calcLatitude, calcLongitude, line;
 				Coordinate newPoint;
 				if (ggaQueue.Count != 0)
@@ -263,9 +311,9 @@ namespace GPSTesT
 								{
 									 calcLongitude = "-" + calcLongitude;
 								}
-								hour = Convert.ToChar(splitResult[1].Substring(0, 2));
-								minute = Convert.ToChar(splitResult[1].Substring(2, 2));
-								second = Convert.ToChar(splitResult[1].Substring(4, 2));
+								hour = Convert.ToInt32(splitResult[1].Substring(0, 2));
+                                minute = Convert.ToInt32(splitResult[1].Substring(2, 2));
+                                second = Convert.ToInt32(splitResult[1].Substring(4, 2));
 
 								newPoint = new Coordinate(Convert.ToDouble(calcLatitude), Convert.ToDouble(calcLongitude), Convert.ToDouble(splitResult[8]), hour, minute, second);
 								coordArray.Add(newPoint);
@@ -318,5 +366,16 @@ namespace GPSTesT
 				offsetX = offsetY = 0;
 				redraw(true);
 		  }
+
+          private void openFileDialog1_FileOk(object sender, CancelEventArgs e)
+          {
+              importFile(openFileDialog1.FileName);
+              timer1.Start();
+          }
+
+          private void loadFileButton_Click(object sender, EventArgs e)
+          {
+              openFileDialog1.ShowDialog();
+          }
 	 }
 }
