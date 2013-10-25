@@ -67,14 +67,20 @@ namespace GPSTesT
              StreamReader reader = new StreamReader(fileName);
              string line = reader.ReadLine();
              while(reader.EndOfStream == false){
+                 line = reader.ReadLine();
                  while((line == "")&&(reader.EndOfStream==false)){
                      line = reader.ReadLine();
                  }
                 if(line.Contains("GGA")==true){
                     ggaQueue.Enqueue(line);
                 }
+                 if(ggaQueue.Count >= 100)
+                 {
+                     addItems();
+                 }
              }
              reader.Close();
+             addItems();
          }
 
 		  private void label2_Click(object sender, EventArgs e)
@@ -262,9 +268,9 @@ namespace GPSTesT
 				redraw(true);
 		  }
 
-		  private void timer1_Tick(object sender, EventArgs e)
-		  {
-				char[] sepChar = { ',' };
+         private void addItems()
+         {
+             char[] sepChar = { ',' };
 				char[] splitChar = { '.' };
 				string[] splitResult, rawLatitude, rawLongitude;
 				double minLatitude, minLongitude;
@@ -322,6 +328,10 @@ namespace GPSTesT
 					 }
 				}
 				redraw(false);
+         }
+		  private void timer1_Tick(object sender, EventArgs e)
+		  {
+				addItems();
 		  }
 
 		  private void takeButton_Click(object sender, EventArgs e)
