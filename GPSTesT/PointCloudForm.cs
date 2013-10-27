@@ -63,24 +63,24 @@ namespace GPSTesT
 
 		  }
 
-         private void importFile(string fileName){
+         private void importFile(string fileName){      //Import data from file
              StreamReader reader = new StreamReader(fileName);
              string line = reader.ReadLine();
-             while(reader.EndOfStream == false){
-                 line = reader.ReadLine();
-                 while((line == "")&&(reader.EndOfStream==false)){
+             while(reader.EndOfStream == false){        //As long as file not finished
+                 line = reader.ReadLine();              //Read a line
+                 while((line == "")&&(reader.EndOfStream==false)){  //Remove empty lines
                      line = reader.ReadLine();
                  }
-                if(line.Contains("GGA")==true){
-                    ggaQueue.Enqueue(line);
+                if(line.Contains("GGA")==true){         //If line is a GGA message
+                    ggaQueue.Enqueue(line);             //Save line
                 }
-                 if(ggaQueue.Count >= 100)
+                 if(ggaQueue.Count >= 100)              //After 100 messages
                  {
-                     addItems();
+                     addItems();                        //Add messages to display to prevent memory usage overflow
                  }
              }
-             reader.Close();
-             addItems();
+             reader.Close();                            //When finished, close Reader
+             addItems();                                //Add resting messages
          }
 
 		  private void label2_Click(object sender, EventArgs e)
@@ -88,7 +88,7 @@ namespace GPSTesT
 
 		  }
 
-          private Color getColor(Coordinate input)
+          private Color getColor(Coordinate input)      //Return a different color for each hour
           {
               switch (input.hour)
               {
@@ -210,65 +210,70 @@ namespace GPSTesT
 				}
 		  }
 
-		  private void applyButton_Click(object sender, EventArgs e)
+         private int getRingSize()
+          {
+              if (zoom >= 4000000)
+              {
+                  return 1;
+              }
+              else if ((zoom < 4000000) && (zoom >= 2000000))
+              {
+                  return 2;
+              }
+              else if ((zoom < 2000000) && (zoom >= 800000))
+              {
+                  return 5;
+              }
+              else if ((zoom < 800000) && (zoom >= 400000))
+              {
+                  return 10;
+              }
+              else if ((zoom < 400000) && (zoom >= 200000))
+              {
+                  return 20;
+              }
+              else if ((zoom < 200000) && (zoom >= 80000))
+              {
+                  return 50;
+              }
+              else if ((zoom < 80000) && (zoom >= 40000))
+              {
+                  return 100;
+              }
+              else if ((zoom < 40000) && (zoom >= 20000))
+              {
+                  return 200;
+              }
+              else if ((zoom < 20000) && (zoom >= 8000))
+              {
+                  return 500;
+              }
+              else
+              {
+                  return 1000;
+              }
+          }
+
+		  private void applyButton_Click(object sender, EventArgs e)        //If apply settings button clicked
 		  {
-				centerLong = Convert.ToDouble(longCenterBox.Text);
+				centerLong = Convert.ToDouble(longCenterBox.Text);          //set center
 				centerLat = Convert.ToDouble(latCenterBox.Text);
 
-				if (cbCenterNS.SelectedIndex == 1)
+				if (cbCenterNS.SelectedIndex == 1)                          //Correct +/- in north/south
 				{
 					 centerLat = Convert.ToDouble("-" + latCenterBox.Text);
 				}
-				if (cbCenterEW.SelectedIndex == 1)
+				if (cbCenterEW.SelectedIndex == 1)                          //Correct +/- in east/west
 				{
 					 centerLong = Convert.ToDouble("-" + longCenterBox.Text);
 				}
 
-				zoom = Convert.ToDouble(zoomBox.Text);
-				if (zoom >= 4000000)
-				{
-					 ringSize = 1;
-				}
-				else if ((zoom < 4000000) && (zoom >= 2000000))
-				{
-					 ringSize = 2;
-				}
-				else if ((zoom < 2000000) && (zoom >= 800000))
-				{
-					 ringSize = 5;
-				}
-				else if ((zoom < 800000) && (zoom >= 400000))
-				{
-					 ringSize = 10;
-				}
-				else if ((zoom < 400000) && (zoom >= 200000))
-				{
-					 ringSize = 20;
-				}
-				else if ((zoom < 200000) && (zoom >= 80000))
-				{
-					 ringSize = 50;
-				}
-				else if ((zoom < 80000) && (zoom >= 40000))
-				{
-					 ringSize = 100;
-				}
-				else if ((zoom < 40000) && (zoom >= 20000))
-				{
-					 ringSize = 200;
-				}
-				else if ((zoom < 20000) && (zoom >= 8000))
-				{
-					 ringSize = 500;
-				}
-				else
-				{
-					 ringSize = 1000;
-				}
-				redraw(true);
+				zoom = Convert.ToDouble(zoomBox.Text);                      //Set zoom
+                ringSize = getRingSize();                                   //Get coordinate System ringsize
+				redraw(true);                                               //Draw everything
 		  }
 
-         private void addItems()
+         private void addItems()                                //Add a GGA message to display
          {
              char[] sepChar = { ',' };
 				char[] splitChar = { '.' };
@@ -277,24 +282,24 @@ namespace GPSTesT
 				int hour, minute, second;
 				string calcLatitude, calcLongitude, line;
 				Coordinate newPoint;
-				if (ggaQueue.Count != 0)
+				if (ggaQueue.Count != 0)                        //If queue not empty
 				{
-					 for (int a = 0; a < ggaQueue.Count; a++)
+					 for (int a = 0; a < ggaQueue.Count; a++)   //For all entries
 					 {
-						  line = ggaQueue.Dequeue();
-						  splitResult = line.Split(sepChar);
-						  if (Convert.ToInt16(splitResult[6]) > 0)
+						  line = ggaQueue.Dequeue();            //Get a message
+						  splitResult = line.Split(sepChar);    //Split message
+						  if (Convert.ToInt16(splitResult[6]) > 0)//If position is valid
 						  {
-								rawLatitude = splitResult[2].Split(splitChar);
-								rawLongitude = splitResult[4].Split(splitChar);
-								minLatitude = Convert.ToDouble(rawLatitude[0].Substring(rawLatitude[0].Length - 2));
+								rawLatitude = splitResult[2].Split(splitChar);  //Get latitude
+								rawLongitude = splitResult[4].Split(splitChar); //Get longitude
+								minLatitude = Convert.ToDouble(rawLatitude[0].Substring(rawLatitude[0].Length - 2));    //Convert longitude and latitude format
 								minLongitude = Convert.ToDouble(rawLongitude[0].Substring(rawLongitude[0].Length - 2));
 								calcLatitude = rawLatitude[0].Substring(0, rawLatitude[0].Length - 2);
 								calcLatitude += (minLatitude / 60 + Convert.ToDouble(rawLatitude[1]) / (60*(Math.Pow(10, rawLatitude[1].Length)))).ToString().Substring(1);
 								calcLongitude = rawLongitude[0].Substring(0, rawLongitude[0].Length - 2);
 								calcLongitude += (minLongitude / 60 + Convert.ToDouble(rawLongitude[1]) / (60*(Math.Pow(10, rawLongitude[1].Length)))).ToString().Substring(1);
 
-								if ((calcLatitude.Length - calcLatitude.IndexOf('.')) > 7)
+								if ((calcLatitude.Length - calcLatitude.IndexOf('.')) > 7)      //Limit precision to 7 segments after ,
 								{
 									 calcLatitude = calcLatitude.Remove(calcLatitude.IndexOf('.') + 7);
 								}
@@ -303,13 +308,13 @@ namespace GPSTesT
 									 calcLongitude = calcLongitude.Remove(calcLongitude.IndexOf('.') + 7);
 								}
 
-								labelNS.Text = splitResult[3];
+								labelNS.Text = splitResult[3];                                  //Display N/S and E/W of actual position
 								labelEW.Text = splitResult[5];
 
-								longLabel.Text = calcLongitude;
+								longLabel.Text = calcLongitude;                                 //Display coordinates
 								latLabel.Text = calcLatitude;
 
-								if (splitResult[3] == "S")
+								if (splitResult[3] == "S")                                      //Correct N/S E/W values
 								{
 									 calcLatitude = "-" + calcLatitude;
 								}
@@ -317,24 +322,24 @@ namespace GPSTesT
 								{
 									 calcLongitude = "-" + calcLongitude;
 								}
-								hour = Convert.ToInt32(splitResult[1].Substring(0, 2));
+								hour = Convert.ToInt32(splitResult[1].Substring(0, 2));         //Save time
                                 minute = Convert.ToInt32(splitResult[1].Substring(2, 2));
                                 second = Convert.ToInt32(splitResult[1].Substring(4, 2));
 
-								newPoint = new Coordinate(Convert.ToDouble(calcLatitude), Convert.ToDouble(calcLongitude), Convert.ToDouble(splitResult[8]), hour, minute, second);
+								newPoint = new Coordinate(Convert.ToDouble(calcLatitude), Convert.ToDouble(calcLongitude), Convert.ToDouble(splitResult[8]), hour, minute, second); //Save coordinate
 								coordArray.Add(newPoint);
 								numberOfRecords++;
 						  }
 					 }
 				}
-				redraw(false);
+				redraw(false);      //Draw new entries
          }
 		  private void timer1_Tick(object sender, EventArgs e)
 		  {
 				addItems();
 		  }
 
-		  private void takeButton_Click(object sender, EventArgs e)
+		  private void takeButton_Click(object sender, EventArgs e) //Sets coordinate textboxes to actual coordinate
 		  {
 				longCenterBox.Text = longLabel.Text;
 				latCenterBox.Text = latLabel.Text;
@@ -357,23 +362,23 @@ namespace GPSTesT
 				}
 		  }
 
-		  private void pictureBox_MouseDown(object sender, MouseEventArgs e)
+		  private void pictureBox_MouseDown(object sender, MouseEventArgs e)    //If mouse key is pressed down
 		  {
-				mouseStart.X = e.X;
+				mouseStart.X = e.X;                                             //Save actual coordinates of mouse on screen
 				mouseStart.Y = e.Y;
 		  }
 
-		  private void pictureBox_MouseUp(object sender, MouseEventArgs e)
+		  private void pictureBox_MouseUp(object sender, MouseEventArgs e)      //If mouse key is released
 		  {
-				offsetX += (e.X - mouseStart.X);
+				offsetX += (e.X - mouseStart.X);                                //Calculate translation                               
 				offsetY += (e.Y - mouseStart.Y);
 
 				redraw(true);
 		  }
 
-		  private void centerButton_Click(object sender, EventArgs e)
+		  private void centerButton_Click(object sender, EventArgs e)           //If center button is clicked
 		  {
-				offsetX = offsetY = 0;
+				offsetX = offsetY = 0;                                          //Reset offset and draw display
 				redraw(true);
 		  }
 

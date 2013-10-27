@@ -44,7 +44,7 @@ namespace GPSTesT
 				string Line, replaced;
                 char[] splitChar = { ',', ' ' };
                 string[] splittedString;
-                splittedString = filterString.Split(splitChar, StringSplitOptions.RemoveEmptyEntries);
+                splittedString = filterString.Split(splitChar, StringSplitOptions.RemoveEmptyEntries);  //Get all filter values
                 writer = File.AppendText(fileLoc);
 				if (first == false)			 //If not first call
 				{
@@ -59,26 +59,26 @@ namespace GPSTesT
 						  }
 						  else
 						  {
-                              for (int b = 0; b < splittedString.Length; b++)
+                              for (int b = 0; b < splittedString.Length; b++)   //Test for every filter entry
                               {
-                                  if ((replaced.Contains(splittedString[b]) == true))
+                                  if ((replaced.Contains(splittedString[b]) == true))   //If message contains filter sequence
                                   {
-                                      if (count == 0)
+                                      if (count == 0)                           //If divisor says save
                                       {
-                                          displayData.Enqueue(replaced);
-                                          writer.WriteLine(replaced);
+                                          displayData.Enqueue(replaced);    //Hand line to display
+                                          writer.WriteLine(replaced);       //Save line to file
                                       }
                                   }
                               }
 						  }
-						  if ((Line.Contains("GPGGA") == true))
+						  if ((Line.Contains("GPGGA") == true))             //If line is a GGA message
 						  {
-                              if (count == 0)
+                              if (count == 0)                               //If divisor says save
                               {
-                                  ggaQueue.Enqueue(replaced);
-                                  count = divisor;
+                                  ggaQueue.Enqueue(replaced);               //Save message
+                                  count = divisor;                          //Reset count
                               }
-                              count--;
+                              count--;                                      //Decrease divisor counter
 						  }
 					 }
 				}
@@ -102,17 +102,6 @@ namespace GPSTesT
 				}
 		  }
 
-          public string GetAll(int position)	  //Return a line
-          {
-              if (position < data.Count)
-              {
-                  return data.ElementAt(position);
-              }
-              else
-              {
-                  return "";
-              }
-          }
 
 		  public ArrayList GetFilteredStatic(string filterString)	//Filter all data
 		  {
